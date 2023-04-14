@@ -35,24 +35,24 @@ function App() {
         setCounts([...counts, { location: country, count: 1 }]);
       }
 
-      await axios.post("/api/counts", { counts });
+      // await axios.post("/api/counts", { counts });
     } catch (error) {
       console.error(error);
     }
   };
 
-  const fetchCounts = async () => {
-    try {
-      const response = await axios.get("/api/counts");
-      setCounts(response.data);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  // const fetchCounts = async () => {
+  //   try {
+  //     const response = await axios.get("/api/counts");
+  //     setCounts(response.data);
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
 
-  useEffect(() => {
-    fetchCounts();
-  }, []);
+  // useEffect(() => {
+  //   fetchCounts();
+  // }, []);
 
   useEffect(() => {
     localStorage.setItem("clickCounts", JSON.stringify(counts));
