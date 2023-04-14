@@ -6,4 +6,4 @@
 
 ##### App shows total clicks and count clicks from different IP address of country is different.
 
-![CLICKS!](https://res.cloudinary.com/dulasau/image/upload/v1681435379/CLICKS_frhoci.jpg)
+![CLICKS!](https://res.cloudinary.com/dulasau/image/upload/v1681435934/CLICKS_j9sl8e.png)
