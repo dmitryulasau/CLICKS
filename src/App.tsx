@@ -1,24 +1,62 @@
 import { useState, useEffect } from "react";
 import "./App.css";
-
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
+import axios from "axios";
+
+interface Count {
+  location: string;
+  count: number;
+}
+
+interface Response {
+  country_name: string;
+}
 
 function App() {
-  const [count, setCount] = useState(() => {
-    const storedCount = localStorage.getItem("clickCount");
-    return storedCount !== null ? parseInt(storedCount, 10) : 0;
+  const [counts, setCounts] = useState<Count[]>(() => {
+    const storedCounts = localStorage.getItem("clickCounts");
+    return storedCounts !== null ? JSON.parse(storedCounts) : [];
   });
 
-  useEffect(() => {
-    localStorage.setItem("clickCount", count.toString());
-  }, [count]);
+  const handleClick = async () => {
+    try {
+      const response = await axios.get<Response>("https://ipapi.co/json/");
+      const country = response.data.country_name;
 
-  function handleClick() {
-    setCount(count + 1);
-  }
+      const index = counts.findIndex((c) => c.location === country);
+      if (index !== -1) {
+        const newCounts = [...counts];
+        newCounts[index].count++;
+        setCounts(newCounts);
+      } else {
+        setCounts([...counts, { location: country, count: 1 }]);
+      }
+
+      await axios.post("/api/counts", { counts });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const fetchCounts = async () => {
+    try {
+      const response = await axios.get("/api/counts");
+      setCounts(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCounts();
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("clickCounts", JSON.stringify(counts));
+  }, [counts]);
 
   function clearLocalStorage() {
     localStorage.clear();
@@ -34,6 +72,7 @@ function App() {
         justifyItems: "center",
         alignContent: "center",
         textAlign: "center",
+        flexDirection: "column",
       }}
     >
       <Box sx={{ flexGrow: 1 }}>
@@ -65,7 +104,7 @@ function App() {
                 alignItems: "center",
               }}
             >
-              {count}
+              {counts.reduce((acc, c) => acc + c.count, 0)}
             </Box>
           </Grid>
           <Grid item xs={12}>
@@ -107,6 +146,29 @@ function App() {
           </Grid>
         </Grid>
       </Box>
+      {counts.map((c) => (
+        <Box
+          mt="2rem"
+          sx={{
+            alignItems: "center",
+            justifyItems: "center",
+            alignContent: "center",
+            maxWidth: "80rem",
+            bgcolor: "#FFCECE",
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "center",
+            gap: "10rem",
+            padding: "1rem",
+            marginBottom: "0.5rem",
+            fontSize: "2rem",
+          }}
+          key={c.location}
+        >
+          <div>{c.location}</div>
+          <div>{c.count}</div>
+        </Box>
+      ))}
     </Container>
   );
 }
